@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="fr" data-rev="5">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Étapes SAE drone</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>*{box-sizing:border-box}html{color-scheme:dark}body{margin:0}</style>
+<style>
+/* Layout : une seule colonne d'étapes enchaînées, reliées par un rail vertical. Fond noir, couleur seulement dans les cadres. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0a0a; --card:#141414; --card2:#1c1c1c; --fg:#ededed; --muted:#9a9a9a; --line:#2c2c2c;
+  --obj:#5fb3ff; --todo:#ededed; --out:#4fd1a1; --trap:#ffb547; --gate:#c49bff; --s6:#ff8a5c;
+  --display:"Space Grotesk",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:900px;margin:0 auto;padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.7rem,4vw,2.4rem)}
+h2{font-size:1.4rem}
+h3{font-size:1.2rem}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted);max-width:66ch}
+header{display:flex;flex-direction:column;gap:12px}
+.chain{font-family:var(--mono);font-size:.82rem;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;overflow-x:auto;white-space:nowrap}
+
+/* Sommaire */
+.toc{display:flex;flex-wrap:wrap;gap:6px}
+.toc a{font-family:var(--mono);font-size:.78rem;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 9px;font-variant-numeric:tabular-nums}
+.toc a:hover,.toc a:focus-visible{border-color:var(--fg);outline:none}
+.toc a.s6{color:var(--s6)}
+
+/* Semestres */
+.sem{display:flex;flex-direction:column;gap:6px}
+.sem-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.sem-head .eyebrow b{color:var(--fg);font-weight:500}
+.sem.six .sem-head h2{color:var(--s6)}
+
+/* Étapes */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:44px minmax(0,1fr);gap:0 16px;scroll-margin-top:16px}
+.rail{display:flex;flex-direction:column;align-items:center}
+.badge{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--fg);display:grid;place-items:center;font-family:var(--mono);font-weight:500;font-size:.9rem;font-variant-numeric:tabular-nums;flex:none;background:var(--bg)}
+.six .badge{border-color:var(--s6);color:var(--s6)}
+.rail::after{content:"";flex:1;width:1.5px;background:var(--line);margin-top:4px}
+.step:last-child .rail::after{display:none}
+.body{display:flex;flex-direction:column;gap:14px;padding-bottom:36px;min-width:0}
+.title-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding-top:6px}
+.dur{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.tool{font-family:var(--mono);font-size:.76rem;color:var(--fg);background:var(--card2);border-radius:5px;padding:2px 8px}
+.box{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--k);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.box h4{margin:0;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--k)}
+.box ul,.box ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:5px}
+.obj{--k:var(--obj)} .todo{--k:var(--todo)} .out{--k:var(--out)} .trap{--k:var(--trap)} .gate{--k:var(--gate)}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.formula{font-family:var(--mono);font-size:.88rem;background:var(--card2);border-radius:6px;padding:6px 10px;overflow-x:auto;white-space:nowrap}
+.note{font-size:.84rem;color:var(--muted)}
+.gate p::before{content:"✓ ";color:var(--gate);font-weight:600}
+
+/* Outils */
+.panel{display:flex;flex-direction:column;gap:12px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:520px}
+td,th{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--card)}
+
+@media (max-width:640px){
+  .pair{grid-template-columns:1fr}
+  .step{grid-template-columns:34px minmax(0,1fr);gap:0 12px}
+  .badge{width:32px;height:32px;font-size:.8rem}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+
+.sem-head .eyebrow b{color:var(--fg)}
+.chain{white-space:normal}
+.subs{display:flex;flex-direction:column;gap:10px}
+.subs-k{margin:0;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted)}
+.sub{--k:var(--line);background:var(--card);gap:8px}
+.sub-head{display:flex;align-items:baseline;gap:10px}
+.sub-n{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.box h4.sub-t{font-family:var(--display);font-size:1rem;text-transform:none;letter-spacing:0;color:var(--fg)!important;margin:0}
+.sub ol{padding-left:1.4em}
+.find{font-size:.9rem;background:var(--card2);border-radius:6px;padding:7px 10px}
+.find-k{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--out);margin-right:6px}
+.code-box{--k:var(--obj)}
+pre{margin:0;font-family:var(--mono);font-size:.8rem;line-height:1.5;background:#0d1117;border:1px solid var(--line);border-radius:6px;padding:12px;overflow-x:auto;white-space:pre;tab-size:4}
+.gantt-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.gantt{display:grid;grid-template-columns:240px repeat(12,minmax(30px,1fr));gap:5px 2px;min-width:640px;font-size:.82rem;align-items:center}
+.gantt .h{font-family:var(--mono);font-size:.7rem;color:var(--muted);text-align:center}
+.gantt .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px}
+.bar{height:16px;border-radius:4px;background:var(--obj)}
+.bar.light{background:transparent;border:1.5px dashed var(--obj)}
+.bar.cont{background:transparent;border:1.5px dashed var(--out)}
+.phase{font-family:var(--mono);font-size:.72rem;color:var(--gate);border:1px solid var(--gate);border-radius:999px;padding:1px 8px}
+.box.why{--k:#cbd5e1}.box.crit{--k:#f87171;background:#1f1313}.box.prio{--k:#f87171}.box.marg{--k:var(--trap)}
+.bar.marge{background:transparent;border:1.5px dashed var(--trap)}
+.phases{display:flex;flex-wrap:wrap;gap:6px}.phases span{font-family:var(--mono);font-size:.76rem;color:var(--gate);border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.box.team{--k:var(--gate)} .box.plan{--k:var(--obj)} .box.bonus{--k:var(--out)}
+
+.fold{all:unset;cursor:pointer;flex:none;width:24px;height:24px;display:inline-grid;place-items:center;border-radius:6px;color:var(--muted);font-size:.9rem;transition:transform .15s}
+.fold:hover,.fold:focus-visible{color:var(--fg);background:var(--card2);outline:none}
+.foldable.collapsed > .fold-head .fold,.step.collapsed > .body > .fold-head .fold{transform:rotate(-90deg)}
+.foldable.collapsed > .fold-body,.step.collapsed > .body > .fold-body{display:none}
+.fold-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+body:not(.editing) .fold-head{cursor:pointer}
+.step-content,.sub-body,.panel > .fold-body{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sub-body{gap:8px}
+.step.collapsed .body{padding-bottom:18px}
+.title-row{align-items:center}
+.sub{--k:var(--sc);border-left-width:4px}
+.sub .sub-n{background:var(--sc);color:#0a0a0a;font-weight:600;border-radius:5px;padding:1px 7px}
+.box h4.sub-t{color:var(--sc)!important}
+.sub .exp{font-size:.92rem;color:#d4d4d4;background:color-mix(in srgb,var(--sc) 10%,transparent);border-radius:6px;padding:8px 10px}
+.lab{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.c0{--sc:#5fb3ff}.c1{--sc:#3dd6c6}.c2{--sc:#a78bfa}.c3{--sc:#a3e635}.c4{--sc:#fb8f67}.c5{--sc:#67e8f9}
+@media (max-width:640px){.cards{grid-template-columns:1fr}}
+
+/* Barre d'outils et édition */
+:root{--rem:#ff7eb6;--edit:#5fb3ff}
+.toolbar{position:sticky;top:0;z-index:20;background:rgba(10,10,10,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.toolbar-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tb{all:unset;cursor:pointer;font-family:var(--body);font-size:.86rem;font-weight:500;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 11px;background:var(--card)}
+.tb:hover{border-color:var(--fg)}
+.tb:focus-visible{outline:2px solid var(--edit);outline-offset:2px}
+.tb kbd{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-left:6px}
+.tb.on{border-color:var(--edit);color:var(--edit)}
+.tb.rem{border-color:var(--rem);color:var(--rem)}
+.status{font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-left:auto}
+.help{font-size:.82rem;color:var(--muted);max-width:900px;margin:8px auto 0}
+.help[hidden]{display:none}
+body.editing .editable{outline:1px dashed #3a5a7a;outline-offset:4px;border-radius:4px}
+body.editing .editable:focus{outline:1.5px solid var(--edit)}
+.picked{box-shadow:0 0 0 2px var(--rem)}
+.remark{--k:var(--rem);background:#1e1418}
+.remark h4{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.remark .del{all:unset;cursor:pointer;color:var(--muted);font-size:1rem;line-height:1;padding:0 4px;border-radius:4px}
+.remark .del:hover,.remark .del:focus-visible{color:var(--rem);outline:1px solid var(--rem)}
+.remark .txt{outline:none;min-height:1.6em}
+.remark .txt:empty::before{content:"Écris ta remarque ici…";color:var(--muted)}
+.add-rem{all:unset;cursor:pointer;align-self:flex-start;font-size:.82rem;color:var(--rem);border:1px dashed var(--rem);border-radius:6px;padding:4px 10px;opacity:.8}
+.add-rem:hover,.add-rem:focus-visible{opacity:1;outline:none;background:#1e1418}
+#general{display:flex;flex-direction:column;gap:12px}
+</style>
+
+</head>
+<body>
+<div class="toolbar"><div class="toolbar-in">
+  <button class="tb" id="tb-edit" type="button">✎ Modifier le texte<kbd>Ctrl+E</kbd></button>
+  <button class="tb rem" id="tb-rem" type="button">+ Remarque ici<kbd>Ctrl+M</kbd></button>
+  <button class="tb" id="tb-save" type="button">Enregistrer le fichier<kbd>Ctrl+S</kbd></button>
+  <button class="tb" id="tb-fold" type="button">Tout replier</button>
+  <button class="tb" id="tb-unfold" type="button">Tout déplier</button>
+  <button class="tb" id="tb-reset" type="button">Annuler mes modifications</button>
+  <button class="tb" id="tb-help" type="button">Aide</button>
+  <span class="status" id="status"></span>
+</div>
+<p class="help" id="help" hidden><b>Replier / déplier :</b> la flèche ▾ à gauche d'un titre (ou un clic sur le titre hors mode édition). « Tout replier » ne laisse que les titres des étapes.<br><b>Modifier :</b> Ctrl+E (ou ✎), clique dans n'importe quel texte, y compris le code, et tape. Entrée dans une liste ajoute une ligne. Échap pour terminer.<br><b>Remarque :</b> clique sur un cadre puis Ctrl+M (ou « + Remarque ici ») : la remarque se place juste en dessous. Le bouton rose en bas de chaque étape en ajoute une à la fin de l'étape. × pour supprimer.<br><b>Garder les changements :</b> ils restent dans ce navigateur automatiquement. Pour les partager avec le groupe, Ctrl+S télécharge un nouveau fichier HTML à mettre sur le Drive.</p>
+</div>
+<div class="wrap" id="content">
+  <header>
+    <span class="eyebrow">INSA Hauts-de-France · Spécialité SET · SAE S5 + S6</span>
+    <h1 data-ed>Détecter un drone à son bruit : les étapes du projet</h1>
+    <p class="lead" data-ed>Le projet suit 6 phases et 15 étapes. Chaque étape est découpée en sous-étapes, avec les outils à utiliser et ce qu'il faut trouver. Chaque bloc est validé avant de passer au suivant, et plusieurs tâches avancent en parallèle (voir le planning).</p>
+    <div class="chain" data-ed>Micros → Amplification → Mise en forme (filtre) → Microcontrôleur (ADC) → TDOA → Couronne de LEDs + WiFi vers PC</div>
+    <div class="phases" aria-label="Les 6 phases"><span>1 · Étude et conception (étapes 1–3)</span><span>2 · Validation théorique et simulation (4–5)</span><span>3 · Prototypage (6–7)</span><span>4 · Fonctionnalités et intégration (8–9)</span><span>5 · Préparation et réalisation du PCB (10–13)</span><span>6 · Validation finale (14–15)</span></div>
+    <nav class="toc" aria-label="Aller à une étape"><a href="#etape-1">1. S'organiser et comprendre le sujet</a><a href="#etape-2">2. Étude bibliographique</a><a href="#etape-3">3. Cahier des charges et architecture</a><a href="#etape-4">4. Simulation analogique sur LTspice</a><a href="#etape-5">5. Traitement du signal sur Colab</a><a href="#etape-6">6. Prototype sur LabBoard</a><a href="#etape-7">7. Programmation embarquée</a><a href="#etape-8">8. Couronne de LEDs et WiFi</a><a href="#etape-9">9. Intégration et tests réels</a><a href="#etape-10">10. Prise en main de KiCad</a><a href="#etape-11">11. Livrables du S5</a><a href="#etape-12" class="s6">12. Routage du PCB</a><a href="#etape-13" class="s6">13. Fabrication et soudure</a><a href="#etape-14" class="s6">14. Validation complète</a><a href="#etape-15" class="s6">15. Corrections et améliorations</a><a href="#priorites">Priorités</a><a href="#organisation">Organisation</a><a href="#planning">Planning</a><a href="#bonus">Bonus</a></nav>
+  </header>
+
+  <section class="panel foldable" id="priorites">
+    <div class="fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h2>Points prioritaires</h2></div><div class="fold-body">
+    <p class="note" data-ed>Le but n'est pas seulement d'avoir un système qui marche pendant une démonstration, mais un système dont les performances, les limites et la fiabilité sont mesurées, analysées et justifiées.</p>
+    <div class="box prio"><h4>À surveiller tout au long du projet</h4><ol>
+        <li data-ed>La synchronisation des micros et la méthode d'acquisition</li>
+        <li data-ed>La validation de l'algorithme TDOA avant l'embarqué</li>
+        <li data-ed>La validation progressive des blocs électroniques</li>
+        <li data-ed>La vérification du fonctionnement en temps réel</li>
+        <li data-ed>Des tests répétables et chiffrés</li>
+        <li data-ed>La validation du prototype avant le PCB définitif</li>
+        <li data-ed>Des critères mesurables pour la validation finale</li>
+    </ol></div>
+  </div></section>
+
+  <section class="panel foldable" id="organisation">
+    <div class="fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h2>Organisation et suivi du projet</h2></div><div class="fold-body">
+    <p class="note" data-ed>La répartition doit éviter que l'un attende l'autre en permanence, avec une personne responsable de l'intégration pour garder la cohérence entre les parties.</p>
+    <div class="cards">
+      <div class="box team"><h4>Répartition des tâches</h4><ul>
+        <li data-ed>Un responsable par grande partie : analogique, traitement du signal, embarqué, LEDs et WiFi, PCB, rapport</li>
+        <li data-ed>Répartir les tâches selon les compétences et la charge de travail</li>
+        <li data-ed>Un responsable de l'intégration générale</li>
+      </ul></div>
+      <div class="box team"><h4>Suivi</h4><ul>
+        <li data-ed>Des points réguliers pour vérifier l'avancement (par exemple 15 minutes en début de séance)</li>
+        <li data-ed>Mettre à jour Trello régulièrement</li>
+        <li data-ed>Partager schémas, codes, simulations, mesures et résultats</li>
+        <li data-ed>Une organisation cohérente sur Drive et GitHub</li>
+        <li data-ed>Documenter les décisions techniques</li>
+        <li data-ed>Repérer vite les tâches bloquantes</li>
+        <li data-ed>Prévoir des marges pour les problèmes techniques et les retards</li>
+      </ul></div>
+    </div>
+  </div></section>
+
+  <section class="sem" id="s5">
+    <div class="sem-head"><h2>Semestre 5</h2><span class="eyebrow">Simulation et prototype sur LabBoard · <b>≈ 12 semaines</b></span></div>
+    <ol class="steps">
+  <li class="step foldable" id="etape-1">
+   <div class="rail"><span class="badge">1</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>S'organiser et comprendre le sujet</h3><span class="dur" data-ed>sem. 1 · 1 semaine</span><span class="phase">Phase 1 · Étude et conception</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>Google Drive</span><span class="tool" data-ed>Trello</span><span class="tool" data-ed>GitHub</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Que tout le groupe comprenne le sujet de la même façon avant de commencer.</p></div>
+    
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">1.1</span><h4 class="sub-t" data-ed>Lire le sujet ensemble</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le sujet mélange électronique analogique, traitement du signal, programmation et réseau. Le lire ensemble permet de repérer tôt les mots inconnus (TDOA, ADC, offset…) et de se mettre d'accord sur ce qu'on doit livrer.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Présentation SAE</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Relire la présentation diapo par diapo</li><li data-ed>Noter tout ce que vous ne comprenez pas (mots, attentes, matériel)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La liste de vos questions.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">1.2</span><h4 class="sub-t" data-ed>Préparer l'espace de travail</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Un projet à 5 produit beaucoup de fichiers. Si chacun garde ses versions sur son ordinateur, on perd du temps à chercher la bonne. Un dossier commun et un rapport ouvert dès le premier jour évitent ça.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Drive</span><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>Trello</span><span class="tool" data-ed>GitHub</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Dossier Drive avec des sous-dossiers : Biblio, CDC, LTspice, Colab, Mesures, KiCad, Rapport</li><li data-ed>Un seul document « Rapport » dès maintenant, avec le plan des chapitres</li><li data-ed>Un tableau Trello avec une colonne par étape</li><li data-ed>Un dépôt GitHub pour le code du microcontrôleur et du PC</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un endroit unique où ranger schémas, codes, mesures et simulations.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">1.3</span><h4 class="sub-t" data-ed>Questions à l'enseignant</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le choix du matériel change tout le reste : un micro numérique n'a pas besoin d'ampli, un autre microcontrôleur n'a pas le même ADC. Mieux vaut le savoir avant de concevoir.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Mail ou séance</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Microcontrôleur et micros imposés ou libres ?</li><li data-ed>Combien de micros minimum ?</li><li data-ed>Dates du rapport et de l'oral, nombre d'heures encadrées</li><li data-ed>Accès à un vrai drone pour les tests ?</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Vos dates de rendu et le matériel disponible.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un espace de travail prêt</li><li data-ed>La liste de vos questions avec les réponses</li><li data-ed>Vos dates de rendu</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Attendre d'avoir « tout compris » pour démarrer. C'est l'étape suivante qui vous fera comprendre.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 2</h4><p data-ed>Vous savez quel matériel est imposé et quand vous devez rendre.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-2">
+   <div class="rail"><span class="badge">2</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Étude bibliographique</h3><span class="dur" data-ed>sem. 1–2 · 2 semaines, à continuer en parallèle</span><span class="phase">Phase 1 · Étude et conception</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Google Scholar</span><span class="tool" data-ed>Zotero</span><span class="tool" data-ed>Google Docs</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Comprendre comment on détecte un drone à son bruit et comment on trouve sa direction.</p></div>
+    
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">2.1</span><h4 class="sub-t" data-ed>Le son d'un drone</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Un drone fait un bruit régulier car ses hélices tournent vite et à vitesse presque constante. Ce bruit contient une fréquence de base (la BPF) et ses multiples. Connaître cette plage permet de régler le filtre pour garder le drone et rejeter le reste.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Scholar</span><span class="tool" data-ed>YouTube (spectrogrammes)</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Fréquence de passage des pales (BPF) et harmoniques</li><li data-ed>Plage de fréquences utile d'un petit drone</li><li data-ed>Ce qui le distingue d'une voix, d'un ventilateur, d'une voiture</li></ul>
+        <div class="formula" data-ed>BPF = nb_pales × tr/min ÷ 60   (2 pales à 6 000 tr/min → 200 Hz, puis 400, 600 Hz…)</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La bande de fréquences à garder dans votre filtre (ordre de grandeur : 100 Hz à quelques kHz).</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">2.2</span><h4 class="sub-t" data-ed>Le principe TDOA</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le son se déplace à environ 343 m/s. S'il vient de côté, il touche un micro un tout petit peu avant l'autre. Mesurer ce retard (Δt) et connaître la distance entre micros suffit pour calculer l'angle d'arrivée.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Scholar</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Retard entre deux micros et lien avec l'angle</li><li data-ed>Corrélation croisée classique et méthode GCC-PHAT</li><li data-ed>Ambiguïté avant/arrière avec seulement deux micros</li></ul>
+        <div class="formula" data-ed>θ = arcsin( c · Δt ÷ d )   avec c ≈ 343 m/s, d = distance entre micros</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La formule de l'angle et le nombre de micros qu'il vous faut pour couvrir 360°.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">2.3</span><h4 class="sub-t" data-ed>Les réseaux de micros</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Avec deux micros, on ne distingue pas un son venant de devant d'un son venant de derrière. Avec trois ou quatre micros on couvre 360°. Plus les micros sont éloignés, plus le retard est grand et plus l'angle est précis.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Articles</span><span class="tool" data-ed>Datasheets</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Ligne, triangle, carré : avantages de chaque forme</li><li data-ed>Lien entre écartement des micros et précision</li><li data-ed>Micros électret ou MEMS (analogiques ou numériques I2S)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une proposition de géométrie (par exemple 4 micros en carré de 20 cm).</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">2.4</span><h4 class="sub-t" data-ed>L'état de l'art</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le jury attend que vous situiez votre solution par rapport à ce qui existe. Montrer pourquoi l'acoustique est intéressante (drone caché, pas d'émission radio) justifie le projet.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Scholar</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Radar, caméra, détection radio, acoustique : avantages et limites</li><li data-ed>Produits anti-drone existants</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un tableau comparatif pour le contexte du rapport.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c4">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">2.5</span><h4 class="sub-t" data-ed>Les données de test</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Pour mettre au point l'algorithme sans drone, il faut des sons réels. Les bruits parasites servent à vérifier que le système ne se déclenche pas pour une voix ou un ventilateur.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Zenodo</span><span class="tool" data-ed>Kaggle</span><span class="tool" data-ed>GitHub</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Chercher des enregistrements de drones gratuits (WAV)</li><li data-ed>Enregistrer aussi des bruits parasites : voix, ventilateur, circulation</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un dossier de fichiers audio pour l'étape 5.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Une synthèse de 3 à 5 pages avec 10 à 15 sources, qui deviendra un chapitre du rapport</li><li data-ed>Des enregistrements de drones et de bruits parasites</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Copier des articles sans les reformuler. À l'oral, le jury pose des questions dessus.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 3</h4><p data-ed>Chacune peut expliquer en deux minutes comment on trouve la direction d'un son avec deux micros.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-3">
+   <div class="rail"><span class="badge">3</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Cahier des charges et architecture</h3><span class="dur" data-ed>sem. 2–3 · 1 à 2 semaines</span><span class="phase">Phase 1 · Étude et conception</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>draw.io</span><span class="tool" data-ed>Datasheets</span><span class="tool" data-ed>Tableur</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Écrire ce que le système doit faire, avec des chiffres, puis choisir les composants.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Cette étape conditionne la conception électronique, le traitement du signal, la programmation et le PCB. Il faut y préciser la géométrie du réseau de micros, la convention d'angle, les contraintes d'acquisition et les performances attendues.</p></div>
+    <div class="box crit"><h4>Point critique · Synchronisation des microphones</h4><p data-ed>Le TDOA repose sur la mesure précise des différences de temps d'arrivée entre micros. Si les micros sont lus l'un après l'autre par un ADC multiplexé, ce décalage fausse les retards mesurés et donc la direction. La méthode d'acquisition doit être étudiée et validée dès l'architecture pour garantir une synchronisation suffisante entre les voies.</p></div>
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.1</span><h4 class="sub-t" data-ed>Géométrie des micros</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Tout le calcul TDOA dépend des positions exactes des micros. Si la géométrie n'est pas fixée et cotée, le code, la simulation et le PCB n'utiliseront pas les mêmes distances.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>draw.io</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Définir précisément le nombre de micros, leur position, leur orientation et la distance entre eux</li><li data-ed>Faire un schéma coté vu de dessus</li><li data-ed>Vérifier le nombre de micros nécessaire pour déterminer la direction et lever les ambiguïtés (avant / arrière)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un schéma coté. Exemple : 4 micros aux coins d'un carré de 20 cm, tous orientés vers le haut.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.2</span><h4 class="sub-t" data-ed>Convention d'angle</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Sans convention commune, une personne compte les angles dans le sens horaire et une autre dans l'autre sens. Les LEDs s'allument alors du mauvais côté. Une seule figure de référence évite ces erreurs.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>draw.io</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Définir où est 0°, la référence, le sens de rotation et la plage (0 à 360° ou −180 à +180°)</li><li data-ed>Associer chaque LED de la couronne à un angle</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une figure qui servira à toute l'équipe, dans le code comme dans les tests.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.3</span><h4 class="sub-t" data-ed>Performances visées</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Des objectifs chiffrés permettent de dire à la fin si le système marche ou non. Ils guident aussi les choix : une grande précision demande plus d'écart entre micros ou une fréquence d'échantillonnage plus haute.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Docs</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Portée de détection</li><li data-ed>Précision angulaire</li><li data-ed>Taux de détection</li><li data-ed>Taux de fausses détections</li><li data-ed>Temps de réaction</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un tableau d'exigences chiffrées. Exemple : portée 10 m, précision ±15°, détection 90 %, fausses détections &lt; 5 %, réaction &lt; 1 s.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.4</span><h4 class="sub-t" data-ed>Acquisition</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le retard entre micros est de l'ordre de la fraction de milliseconde. Il faut échantillonner assez vite pour que ce retard représente plusieurs échantillons, sinon l'angle ne peut prendre que quelques valeurs.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Colab</span><span class="tool" data-ed>Datasheets</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Définir la fréquence d'échantillonnage, la résolution de l'ADC et les contraintes temporelles</li><li data-ed>Calculer le retard maximum et le nombre d'échantillons qu'il représente</li><li data-ed>Définir la résolution et les caractéristiques de l'ADC (nombre de voies, vitesse, échantillonnage simultané ou multiplexé)</li><li data-ed>Vérifier la synchronisation entre les voies d'acquisition</li></ul>
+        <div class="formula" data-ed>Δt_max = d ÷ c = 0,20 ÷ 343 ≈ 0,58 ms  →  à 48 kHz ≈ 28 échantillons</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Fs, résolution ADC, taille des fenêtres. Le retard max doit valoir au moins une vingtaine d'échantillons.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c4">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.5</span><h4 class="sub-t" data-ed>Choix des composants</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Chaque composant doit être compatible avec les autres (tension, interface, vitesse). Le point critique est l'acquisition : si le microcontrôleur lit les micros l'un après l'autre, ce décalage s'ajoute au vrai retard.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Datasheets</span><span class="tool" data-ed>Mouser, Farnell</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Micros (électret + ampli, ou MEMS)</li><li data-ed>Ampli op adapté à la tension d'alimentation (la présentation parle de 1,8 V)</li><li data-ed>Microcontrôleur avec WiFi (par exemple ESP32)</li><li data-ed>Couronne de LEDs (par exemple WS2812)</li><li data-ed>Vérifier que le microcontrôleur et l'ADC permettent des acquisitions suffisamment synchronisées entre les micros</li><li data-ed>Vérifier la compatibilité entre micros, amplificateurs, filtres et microcontrôleur (tensions, niveaux, impédances)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une liste de composants avec la raison de chaque choix. Un ADC multiplexé lit les voies l'une après l'autre : il faut connaître ce décalage, le compenser, ou choisir un ADC à échantillonnage simultané.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c5">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.6</span><h4 class="sub-t" data-ed>Contraintes du microcontrôleur</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le microcontrôleur doit acquérir, calculer la corrélation, piloter les LEDs et le WiFi en même temps. Il faut vérifier dès maintenant qu'il a assez de mémoire pour stocker les fenêtres de chaque micro et assez de puissance pour calculer avant la fenêtre suivante.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Datasheet du microcontrôleur</span><span class="tool" data-ed>Colab</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Estimer la mémoire nécessaire : nombre de micros × taille de fenêtre × octets par échantillon</li><li data-ed>Estimer le nombre de calculs de la corrélation par fenêtre</li><li data-ed>Fixer le temps maximal de traitement d'une fenêtre (contrainte temps réel)</li></ul>
+        <div class="formula" data-ed>Mémoire ≈ 4 micros × 1024 échantillons × 2 octets = 8 ko par fenêtre</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un bilan mémoire et calcul qui confirme le choix du microcontrôleur.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.7</span><h4 class="sub-t" data-ed>Budget de consommation</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le système doit pouvoir fonctionner sur batterie. Additionner la consommation de chaque bloc montre vite quel bloc coûte le plus (souvent le WiFi et les LEDs) et quelle batterie choisir.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Tableur</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Lister la consommation de chaque bloc (micro, ampli, microcontrôleur, WiFi, LEDs)</li><li data-ed>En déduire l'autonomie avec la batterie envisagée</li></ul>
+        <div class="formula" data-ed>Autonomie (h) ≈ capacité batterie (mAh) ÷ courant total (mA)</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un tableau de consommation prévisionnel.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">3.8</span><h4 class="sub-t" data-ed>Architecture</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le synoptique est la carte du système. Il montre ce qui entre et sort de chaque bloc, ce qui permet à chacun de travailler sur sa partie en sachant ce qu'il reçoit et ce qu'il doit fournir.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>draw.io</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Redessiner le synoptique avec vos blocs : micros, amplification, mise en forme, commande, TDOA, LEDs, WiFi</li><li data-ed>Indiquer les tensions et les signaux entre chaque bloc</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le schéma fonctionnel du rapport.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Une architecture système clairement définie</li><li data-ed>Une géométrie des micros justifiée</li><li data-ed>Une méthode d'acquisition compatible avec le TDOA</li><li data-ed>Des contraintes techniques clairement identifiées</li><li data-ed>Un cahier des charges avec des critères de performance mesurables</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Des exigences floues comme « détecter de loin ». Si on ne peut pas le mesurer, on ne peut pas le valider.</li><li data-ed>Choisir le microcontrôleur et les ADC avant d'avoir vérifié qu'ils acquièrent les signaux de plusieurs micros de manière suffisamment synchronisée pour le TDOA.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 4</h4><p data-ed>Le cahier des charges est relu par l'enseignant et les composants sont choisis.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-4">
+   <div class="rail"><span class="badge">4</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Simulation analogique sur LTspice</h3><span class="dur" data-ed>sem. 3–4 · 2 semaines</span><span class="phase">Phase 2 · Validation théorique et simulation</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>LTspice</span><span class="tool" data-ed>Datasheets</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Concevoir et vérifier en simulation la chaîne micro → ampli → filtre → entrée de l'ADC.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Les simulations doivent vérifier le comportement de la chaîne analogique, mais aussi trouver ses limites dans des conditions proches de la réalité.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">4.1</span><h4 class="sub-t" data-ed>Préampli</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Un micro produit seulement quelques millivolts. L'ampli doit les porter à une tension que l'ADC peut mesurer finement, sans dépasser sa plage, sinon le signal est écrêté (saturation).</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>LTspice</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Modéliser le micro par une source sinus de quelques mV</li><li data-ed>Calculer le gain nécessaire</li><li data-ed>Tester avec différentes amplitudes d'entrée</li><li data-ed>Vérifier les risques de saturation de l'ampli</li><li data-ed>Mesurer le gain de chaque étage</li></ul>
+        <div class="formula" data-ed>G = tension pleine échelle ADC ÷ amplitude micro   (ex. 1,6 V ÷ 10 mV = 160)</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La valeur du gain et des résistances.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">4.2</span><h4 class="sub-t" data-ed>Filtre passe-bande</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le filtre garde la bande où se trouve le drone et atténue le reste : bruit très grave (vent, vibrations) et très aigu. Moins il y a de bruit, plus la corrélation entre micros est fiable.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>LTspice</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Choisir les fréquences de coupure à partir de la biblio</li><li data-ed>Tester la réponse sur plusieurs fréquences</li><li data-ed>Tester avec un signal bruité</li></ul>
+        <div class="formula" data-ed>fc = 1 ÷ (2π · R · C)</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les valeurs R et C du filtre.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">4.3</span><h4 class="sub-t" data-ed>Offset et entrée ADC</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le micro donne un signal qui oscille autour de 0 V, mais l'ADC ne mesure que des tensions positives. On ajoute une tension continue (offset) pour que le signal oscille autour du milieu de la plage de l'ADC.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>LTspice</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Ajouter un décalage pour centrer le signal à mi-tension de l'ADC</li><li data-ed>Vérifier la stabilité du signal</li><li data-ed>Vérifier que la tension reste toujours dans la plage admise par l'ADC</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La tension d'offset (mi-alimentation) et le schéma du pont diviseur.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">4.4</span><h4 class="sub-t" data-ed>Réalisme et limites</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Un circuit parfait en simulation peut échouer en vrai. Utiliser les modèles réels des composants (bande passante, tension de sortie max) et ajouter du bruit rapproche la simulation du montage réel.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>LTspice</span><span class="tool" data-ed>Modèles SPICE du fabricant</span><span class="tool" data-ed>Datasheets</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Ajouter du bruit pour représenter un environnement réel</li><li data-ed>Vérifier les marges de fonctionnement des composants (tension de sortie max, bande passante de l'ampli op, vitesse de montée)</li><li data-ed>Comparer les simulations avec les caractéristiques réelles des composants utilisés</li><li data-ed>Vérifier que les signaux de sortie sont adaptés à l'entrée du microcontrôleur</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les limites de la chaîne : amplitude max avant saturation, bruit en sortie, marge restante.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c4">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">4.5</span><h4 class="sub-t" data-ed>Simulations à faire</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>La simulation AC montre comment chaque fréquence est amplifiée. La simulation transitoire montre le signal réel dans le temps, ce qui permet de voir l'écrêtage, l'offset et les déformations.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>LTspice : .ac et .tran</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Simulation AC : courbe de gain et réponse en fréquence</li><li data-ed>Simulation transitoire : sinus en entrée, plusieurs amplitudes</li><li data-ed>Cas extrême : signal fort pour voir la saturation</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les courbes à mettre dans le rapport.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Une chaîne analogique fonctionnelle en simulation</li><li data-ed>Des gains et fréquences de fonctionnement validés</li><li data-ed>Une vérification de la saturation et des amplitudes</li><li data-ed>Une identification des limites de la chaîne analogique</li><li data-ed>Des valeurs de composants justifiées</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Oublier que l'ADC n'accepte pas de tension négative. Sans offset, la moitié du signal disparaît.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 5</h4><p data-ed>Les courbes simulées montrent le bon gain, la bonne bande passante, sans saturation.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-5">
+   <div class="rail"><span class="badge">5</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Traitement du signal sur Colab</h3><span class="dur" data-ed>sem. 2–5 · 2 à 3 semaines, en parallèle des étapes 3 et 4</span><span class="phase">Phase 2 · Validation théorique et simulation</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Google Colab</span><span class="tool" data-ed>Python</span><span class="tool" data-ed>numpy</span><span class="tool" data-ed>scipy</span><span class="tool" data-ed>matplotlib</span><span class="tool" data-ed>soundfile</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Mettre au point la détection et le calcul de direction sur ordinateur, avant le microcontrôleur.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Cette étape valide les algorithmes avant le microcontrôleur. Il ne suffit pas que l'algorithme marche dans un cas idéal : il faut étudier ses performances avec du bruit, des variations d'amplitude et des conditions différentes.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">5.1</span><h4 class="sub-t" data-ed>Charger et visualiser</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Avant de détecter quoi que ce soit, il faut voir à quoi ressemble le son. Le spectrogramme montre les fréquences dans le temps : un drone y apparaît comme des lignes horizontales régulières.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Colab</span><span class="tool" data-ed>soundfile</span><span class="tool" data-ed>matplotlib</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Charger un enregistrement de drone</li><li data-ed>Tracer le signal, son spectre (FFT) et son spectrogramme</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les fréquences caractéristiques de votre drone sur le spectre.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">5.2</span><h4 class="sub-t" data-ed>Filtrer et détecter</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>La détection la plus simple consiste à mesurer l'énergie du signal dans la bande du drone. Si elle dépasse un seuil, on considère qu'un drone est présent. Le seuil se règle en comparant drone et bruits parasites.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>scipy.signal</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Filtre passe-bande identique à celui de l'étape 4</li><li data-ed>Calculer l'énergie dans la bande sur des fenêtres courtes</li><li data-ed>Fixer un seuil de détection</li><li data-ed>Justifier la fréquence d'échantillonnage et la taille des fenêtres</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La valeur du seuil, et le taux de détection et de fausses détections sur vos enregistrements.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">5.3</span><h4 class="sub-t" data-ed>Simuler plusieurs micros</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On n'a pas toujours quatre micros enregistrés en même temps. On peut les simuler : on prend un seul son et on le décale du retard théorique pour chaque micro. On connaît alors le vrai angle et on peut mesurer l'erreur.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>numpy</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Créer les signaux de chaque micro en décalant un même son du bon retard selon la géométrie</li><li data-ed>Ajouter du bruit de niveaux différents</li><li data-ed>Tester plusieurs amplitudes, distances et angles</li><li data-ed>Ajouter des signaux parasites (voix, ventilateur)</li><li data-ed>Tester différentes configurations de micros (ligne, triangle, carré, écartements)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un simulateur qui sert de référence pour tous les tests.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">5.4</span><h4 class="sub-t" data-ed>Estimer le retard et l'angle</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>La corrélation croisée compare deux signaux en les décalant et trouve le décalage où ils se ressemblent le plus. GCC-PHAT est une variante plus robuste au bruit et à l'écho. Ce décalage donne l'angle.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>numpy</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Corrélation croisée classique</li><li data-ed>GCC-PHAT et comparaison des deux</li><li data-ed>Retard → angle avec la convention de l'étape 3</li><li data-ed>Avec 4 micros en carré : un angle sur 360° à partir de deux paires</li><li data-ed>Comparer les résultats obtenus avec les deux méthodes</li></ul>
+        <div class="formula" data-ed>θ = atan2(Δt_y, Δt_x)   (paires de micros sur deux axes perpendiculaires)</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La méthode retenue pour le microcontrôleur.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c4">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">5.5</span><h4 class="sub-t" data-ed>Évaluer</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Il faut chiffrer la qualité de l'algorithme : erreur moyenne en degrés selon le bruit, la distance et l'angle. Ces chiffres serviront de référence quand le même calcul tournera sur le microcontrôleur.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>pandas</span><span class="tool" data-ed>matplotlib</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Comparer les angles estimés aux angles réels</li><li data-ed>Quantifier l'erreur angulaire selon le bruit, la distance et l'angle</li><li data-ed>Tracer des graphiques d'erreur</li><li data-ed>Identifier les limites de l'algorithme</li><li data-ed>Déterminer les paramètres optimaux : taille de fenêtre, filtre, seuil, fréquence d'échantillonnage</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les performances de l'algorithme selon les conditions.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="box code-box"><h4>Ce qu'il faut mettre dans votre notebook · Python</h4><pre data-ed spellcheck="false">import numpy as np, soundfile as sf
+from scipy.signal import butter, sosfilt
+import matplotlib.pyplot as plt
+
+FS = 48000          # fréquence d'échantillonnage (justifiée à l'étape 3)
+C  = 343.0          # vitesse du son (m/s)
+D  = 0.20           # distance entre deux micros (m)
+WIN = 4096          # taille de fenêtre d'analyse (échantillons)
+
+# 1. Charger un enregistrement de drone
+x, fs = sf.read("drone.wav")      # rééchantillonner si fs != FS
+
+# 2. Filtre passe-bande (mêmes coupures que LTspice)
+sos = butter(4, [100, 5000], btype="bandpass", fs=FS, output="sos")
+def filtre(s): return sosfilt(sos, s)
+
+# 3. Détection par énergie
+def detecte(s, seuil):
+    e = np.mean(filtre(s)**2)
+    return e &gt; seuil, e
+
+# 4. Simuler deux micros : le micro 2 reçoit le son avec un retard
+def simule(s, angle_deg, bruit=0.01):
+    dt = D * np.sin(np.radians(angle_deg)) / C
+    k = int(round(dt * FS))
+    m1 = s + bruit*np.random.randn(len(s))
+    m2 = np.roll(s, k) + bruit*np.random.randn(len(s))
+    return m1, m2
+
+# 5. Retard par GCC-PHAT
+def gcc_phat(a, b):
+    n = 2*len(a)
+    A, B = np.fft.rfft(a, n), np.fft.rfft(b, n)
+    R = A*np.conj(B); R /= np.abs(R) + 1e-12
+    cc = np.fft.irfft(R, n)
+    kmax = int(D/C*FS)
+    cc = np.concatenate((cc[-kmax:], cc[:kmax+1]))
+    return (np.argmax(cc) - kmax) / FS          # retard en secondes
+
+def angle(dt):
+    return np.degrees(np.arcsin(np.clip(dt*C/D, -1, 1)))
+
+# 6. Boucle de test : angles réels, estimés, erreurs
+lignes = []
+for vrai in range(-80, 81, 10):
+    for bruit in [0.001, 0.01, 0.05]:
+        m1, m2 = simule(filtre(x[:WIN]), vrai, bruit)
+        est = angle(gcc_phat(m2, m1))
+        lignes.append((vrai, bruit, est, abs(est - vrai)))
+# → tableau + erreur moyenne par niveau de bruit</pre><p class="note" data-ed>Squelette à compléter : les fonctions non écrites sont à coder par vous.</p></div>
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un algorithme de détection fonctionnel</li><li data-ed>Une méthode d'estimation de retard validée</li><li data-ed>Une comparaison entre les méthodes testées</li><li data-ed>Des graphiques représentant les erreurs</li><li data-ed>Une analyse des performances et des limites</li><li data-ed>Une méthode retenue et justifiée pour l'embarqué</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Se lancer dans l'intelligence artificielle. Une détection par énergie et une corrélation suffisent au S5.</li><li data-ed>Tester seulement sur des signaux parfaits. Ajoutez toujours du bruit.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 6</h4><p data-ed>Le notebook retrouve un angle connu avec une erreur conforme au cahier des charges.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-6">
+   <div class="rail"><span class="badge">6</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Prototype sur LabBoard</h3><span class="dur" data-ed>sem. 5–6 · 2 semaines</span><span class="phase">Phase 3 · Prototypage</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>LabBoard</span><span class="tool" data-ed>Oscilloscope</span><span class="tool" data-ed>GBF</span><span class="tool" data-ed>Multimètre</span><span class="tool" data-ed>Tableur</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Câbler la chaîne analogique et vérifier qu'elle se comporte comme la simulation.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Le prototype se valide progressivement, bloc par bloc, pour diagnostiquer facilement les problèmes et ne pas devoir reprendre tout le montage en cas d'erreur.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">6.1</span><h4 class="sub-t" data-ed>Ordre des tests sur une voie</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On suit le chemin du signal de la source vers l'ADC. Si un bloc ne marche pas, inutile de tester les suivants. Cet ordre permet de trouver une panne en quelques minutes au lieu de plusieurs heures.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Multimètre</span><span class="tool" data-ed>Oscilloscope</span><span class="tool" data-ed>GBF</span></div>
+        <div class="lab">À faire</div><ol><li data-ed>Vérifier les tensions d'alimentation</li><li data-ed>Vérifier le fonctionnement du micro</li><li data-ed>Vérifier l'amplification</li><li data-ed>Vérifier le filtre</li><li data-ed>Vérifier l'offset</li><li data-ed>Vérifier le signal final à l'entrée de l'ADC</li><li data-ed>Tester la chaîne avec différentes amplitudes sonores</li><li data-ed>Comparer les mesures avec les simulations LTspice</li><li data-ed>Dupliquer et valider les autres voies</li></ol>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Pour chaque test : valeur attendue, valeur mesurée, écart.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">6.2</span><h4 class="sub-t" data-ed>Plusieurs voies</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Pour le TDOA, toutes les voies doivent se ressembler. Un même son placé juste en face du réseau doit donner des signaux de même forme, même amplitude et sans décalage. Toute différence se traduira par une erreur d'angle.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Oscilloscope 4 voies</span><span class="tool" data-ed>Haut-parleur</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Tester ensuite plusieurs voies</li><li data-ed>Comparer les signaux des micros entre eux</li><li data-ed>Vérifier la présence de bruit et de parasites</li><li data-ed>Vérifier les niveaux de tension et l'absence de saturation</li><li data-ed>Valider l'ensemble de la chaîne analogique avant l'intégration du TDOA</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les écarts de gain et de phase entre voies.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">6.3</span><h4 class="sub-t" data-ed>Rapport de mesures</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Chaque mesure notée avec sa valeur attendue devient une preuve dans le rapport. Elle servira aussi de référence au S6 pour comparer avec le PCB.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Tableur</span><span class="tool" data-ed>Photos d'oscilloscope</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Un tableau par voie</li><li data-ed>Captures d'écran de l'oscilloscope</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Votre rapport de tests, réutilisable au S6.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Des signaux exploitables pour chaque micro</li><li data-ed>Une chaîne analogique fonctionnelle</li><li data-ed>Des mesures de gain, de bruit et de saturation</li><li data-ed>Un prototype stable</li><li data-ed>Une chaîne d'acquisition assez fiable pour les tests de TDOA</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Monter et tester toutes les voies en même temps. Validez chaque bloc et chaque voie individuellement avant l'intégration complète.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 7</h4><p data-ed>Chaque voie donne un signal propre, centré, sans saturation, à l'entrée de l'ADC.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-7">
+   <div class="rail"><span class="badge">7</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Programmation embarquée</h3><span class="dur" data-ed>sem. 6–8 · 2 à 3 semaines</span><span class="phase">Phase 3 · Prototypage</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Arduino IDE ou PlatformIO</span><span class="tool" data-ed>GitHub</span><span class="tool" data-ed>Moniteur série</span><span class="tool" data-ed>Oscilloscope</span><span class="tool" data-ed>Colab</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Faire lire les micros par le microcontrôleur et lui faire calculer la direction.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Il ne suffit pas de récupérer les signaux et d'exécuter l'algorithme : il faut vérifier que l'acquisition et le traitement tiennent dans les contraintes de temps. La synchronisation des voies est le point clé de la fiabilité du TDOA.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">7.1</span><h4 class="sub-t" data-ed>Acquisition</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le microcontrôleur doit prendre les échantillons à intervalle parfaitement régulier, et sur toutes les voies au même instant. On le vérifie en envoyant le même signal sur toutes les entrées : le retard mesuré doit être nul.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Timer matériel</span><span class="tool" data-ed>ADC + DMA ou I2S</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Configurer l'acquisition des micros</li><li data-ed>Échantillonner toutes les voies à fréquence fixe</li><li data-ed>Vérifier que la fréquence d'échantillonnage est stable (pin qui bascule à chaque échantillon, mesurée à l'oscilloscope)</li><li data-ed>Vérifier la synchronisation : même signal sur toutes les entrées, le retard mesuré doit être nul</li><li data-ed>Mesurer le temps nécessaire pour acquérir un bloc de données</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La fréquence réelle et le décalage entre voies.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">7.2</span><h4 class="sub-t" data-ed>Vérification avec Colab</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Avant de faire calculer l'angle au microcontrôleur, on vérifie que les données qu'il lit sont bonnes. On les envoie au PC et on les passe dans le notebook, qui fonctionne déjà.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Moniteur série</span><span class="tool" data-ed>Colab</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Envoyer un bloc d'échantillons au PC</li><li data-ed>Le passer dans le notebook de l'étape 5</li><li data-ed>Comparer les résultats du microcontrôleur avec ceux de Colab</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La preuve que les données sont propres.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">7.3</span><h4 class="sub-t" data-ed>Traitement embarqué</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le microcontrôleur a peu de mémoire et de puissance. On reprend l'algorithme du notebook en le simplifiant : corrélation uniquement sur la petite plage de retards possibles, calculs sur des entiers si nécessaire.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Arduino IDE ou PlatformIO</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Filtre et détection par énergie</li><li data-ed>Corrélation sur une plage de retards limitée (±Δt_max)</li><li data-ed>Calcul de l'angle</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un angle affiché en direct.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">7.4</span><h4 class="sub-t" data-ed>Temps réel</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Si le calcul d'une fenêtre prend plus de temps que l'acquisition de la suivante, des données sont perdues et l'affichage prend du retard. On mesure ces temps pour s'assurer que tout suit.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>micros()</span><span class="tool" data-ed>Oscilloscope</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Mesurer le temps d'acquisition et le temps de traitement</li><li data-ed>Vérifier que le traitement d'une fenêtre finit avant la suivante</li><li data-ed>Mesurer le temps de calcul de l'algorithme TDOA</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le temps de calcul par fenêtre et le temps de réaction.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c4">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">7.5</span><h4 class="sub-t" data-ed>Robustesse</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Un programme qui marche cinq minutes peut planter au bout d'une heure (mémoire qui se remplit, valeur inattendue). Il faut vérifier qu'il reste stable et qu'il réagit correctement aux données anormales.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Moniteur série</span><span class="tool" data-ed>ESP.getFreeHeap()</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Vérifier la mémoire utilisée</li><li data-ed>Vérifier la stabilité sur de nombreux cycles (laisser tourner une heure)</li><li data-ed>Gérer les erreurs d'acquisition et les données incohérentes (signal saturé, angle impossible : ignorer la fenêtre)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La mémoire libre, et la preuve que le programme tourne sans planter.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="box code-box"><h4>Structure du programme (ESP32, Arduino) · C++</h4><pre data-ed spellcheck="false">#define FS       48000   // Hz
+#define WIN      1024    // échantillons par fenêtre
+#define NMIC     4
+#define KMAX     30      // retard max en échantillons (d/c*FS)
+
+int16_t buf[NMIC][WIN];       // rempli par l'ADC (DMA ou interruption timer)
+volatile bool fenetrePrete = false;
+
+void setup() {
+  Serial.begin(921600);
+  initAcquisition();   // timer à FS + lecture des NMIC voies
+  initLEDs();
+  initWiFi();
+}
+
+void loop() {
+  if (!fenetrePrete) return;
+  uint32_t t0 = micros();
+
+  float energie = energieBande(buf[0], WIN);       // détection
+  bool drone = energie &gt; SEUIL;
+
+  float angle = NAN;
+  if (drone) {
+    int kx = meilleurRetard(buf[0], buf[1], KMAX); // corrélation micros 1-2
+    int ky = meilleurRetard(buf[0], buf[3], KMAX); // corrélation micros 1-4
+    angle = atan2((float)ky, (float)kx) * 180.0 / PI;
+  }
+
+  afficherLEDs(angle, energie);
+  envoyerPC(millis(), angle, drone, energie);
+
+  Serial.printf("t=%lu us angle=%.1f\n", micros() - t0, angle);
+  fenetrePrete = false;
+}</pre><p class="note" data-ed>Squelette à compléter : les fonctions non écrites sont à coder par vous.</p></div>
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Une acquisition fonctionnelle</li><li data-ed>Un algorithme de détection embarqué</li><li data-ed>Des mesures du temps d'acquisition et du temps de calcul</li><li data-ed>Des résultats cohérents avec les simulations Python</li><li data-ed>Un fonctionnement assez stable pour l'intégration</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Une acquisition successive des micros peut introduire un retard artificiel et fausser le calcul TDOA. Vérifiez la synchronisation réelle des acquisitions.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 8</h4><p data-ed>L'angle affiché change correctement quand vous déplacez la source sonore, et les résultats correspondent à Colab.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-8">
+   <div class="rail"><span class="badge">8</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Couronne de LEDs et WiFi</h3><span class="dur" data-ed>sem. 7–8 · mode test en parallèle de l'étape 7, intégration après validation de la détection</span><span class="phase">Phase 4 · Fonctionnalités et intégration</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>FastLED ou Adafruit NeoPixel</span><span class="tool" data-ed>WiFi UDP</span><span class="tool" data-ed>Python côté PC</span><span class="tool" data-ed>matplotlib</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Afficher la direction sur les LEDs et enregistrer le suivi sur le PC portable.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>L'intégration se fait après la validation de base de la détection de direction. L'affichage et l'envoi des données ne doivent pas perturber l'acquisition ni le traitement du signal.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">8.1</span><h4 class="sub-t" data-ed>Mode test</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Un angle inventé qui tourne permet de mettre au point l'affichage et le WiFi sans attendre la détection. Quand la détection sera prête, il suffira de remplacer l'angle fictif par le vrai.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Arduino IDE</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Générer un angle fictif qui tourne lentement</li><li data-ed>Tester LEDs et WiFi indépendamment de la détection acoustique</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un affichage et une liaison qui marchent avant que la détection soit prête.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">8.2</span><h4 class="sub-t" data-ed>Affichage sur la couronne</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Chaque LED représente une direction. On convertit l'angle en numéro de LED. Un lissage (moyenne des dernières valeurs) évite que la LED saute dans tous les sens à cause du bruit.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>FastLED</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Allumer la LED correspondant à l'angle (convention de l'étape 3)</li><li data-ed>Indicateur visuel du niveau de confiance (couleur ou luminosité)</li><li data-ed>Stabiliser l'affichage dans le temps (moyenne glissante) pour éviter les sauts trop rapides</li><li data-ed>Définir un comportement en cas de détection incertaine (LEDs éteintes ou couleur neutre)</li></ul>
+        <div class="formula" data-ed>LED = round(angle ÷ 360 × NB_LEDS) mod NB_LEDS</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La formule numéro de LED ↔ angle et la taille du lissage.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">8.3</span><h4 class="sub-t" data-ed>Envoi WiFi</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le PC doit recevoir assez d'informations pour reconstituer ce qui s'est passé : quand, dans quelle direction, si un drone était détecté et avec quelle confiance. Un format texte simple se lit facilement des deux côtés.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>WiFiUDP</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Envoyer au PC : horodatage, angle estimé, état de détection, niveau de confiance</li><li data-ed>Format simple, une ligne texte par mesure : t;angle;etat;confiance</li><li data-ed>Vérifier que l'envoi ne perturbe pas l'acquisition : mesurer la fréquence d'échantillonnage avec le WiFi actif</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le format de message, identique côté ESP32 et côté PC.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">8.4</span><h4 class="sub-t" data-ed>Réception sur PC</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le script PC enregistre tout dans un fichier CSV. Ces fichiers sont la matière de vos tests de l'étape 9 et des graphiques du rapport.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Python</span><span class="tool" data-ed>socket</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Recevoir et afficher les données en temps réel</li><li data-ed>Bonus : affichage graphique de la direction, historique des détections, sauvegarde en CSV</li><li data-ed>Afficher en temps réel l'angle estimé et l'indicateur de confiance</li><li data-ed>Enregistrer les données pour les analyser ensuite</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un script qui tourne pendant les tests.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="box code-box"><h4>Script de réception sur le PC · Python</h4><pre data-ed spellcheck="false">import socket, csv, time
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(("0.0.0.0", 5005))          # même port que l'ESP32
+
+with open("suivi.csv", "w", newline="") as f:
+    w = csv.writer(f, delimiter=";")
+    w.writerow(["t_ms", "angle", "etat", "confiance"])
+    while True:
+        data, _ = sock.recvfrom(256)
+        t, angle, etat, conf = data.decode().strip().split(";")
+        w.writerow([t, angle, etat, conf]); f.flush()
+        print(f"{t} ms  angle={angle}°  drone={etat}  confiance={conf}")</pre><p class="note" data-ed>Squelette à compléter : les fonctions non écrites sont à coder par vous.</p></div>
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Une indication visuelle de la direction</li><li data-ed>Une transmission WiFi fonctionnelle</li><li data-ed>Un affichage PC exploitable</li><li data-ed>Une détection stable</li><li data-ed>Une interface pour suivre le fonctionnement du système</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Attendre que la détection marche pour tester les LEDs et le WiFi. Le mode test permet de les avancer avant.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 9</h4><p data-ed>Un fichier CSV d'un vrai essai est enregistré sur le PC.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-9">
+   <div class="rail"><span class="badge">9</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Intégration et tests réels</h3><span class="dur" data-ed>sem. 9–10 · 2 semaines</span><span class="phase">Phase 4 · Fonctionnalités et intégration</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Haut-parleur</span><span class="tool" data-ed>Mètre, rapporteur</span><span class="tool" data-ed>Tableur</span><span class="tool" data-ed>Python</span><span class="tool" data-ed>matplotlib</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Faire fonctionner l'ensemble et mesurer les performances par rapport au cahier des charges.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Les tests ne se font pas qu'à la fin : chaque étape est validée au fur et à mesure, puis l'ensemble fait l'objet d'une campagne de tests complète et répétable, avec des indicateurs chiffrés.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">9.1</span><h4 class="sub-t" data-ed>Protocole répétable</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Une mesure n'a de valeur que si on peut la refaire dans les mêmes conditions. Marquer les angles au sol et fixer les distances permet de comparer les essais entre eux.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Rapporteur</span><span class="tool" data-ed>Mètre</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Marquer les angles au sol (0°, 45°, 90°…) selon la convention</li><li data-ed>Plusieurs distances (1 m, 3 m, 5 m…)</li><li data-ed>Plusieurs mesures par angle (au moins 10)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un protocole écrit que n'importe qui du groupe peut refaire.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">9.2</span><h4 class="sub-t" data-ed>Campagne de tests</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On fait varier une seule condition à la fois (angle, distance, niveau, bruit) pour savoir ce qui influence les résultats. Chaque configuration est répétée plusieurs fois pour que les chiffres soient fiables.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Haut-parleur</span><span class="tool" data-ed>Sonomètre (appli)</span><span class="tool" data-ed>CSV du PC</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Plusieurs angles d'arrivée</li><li data-ed>Plusieurs distances</li><li data-ed>Différents niveaux sonores</li><li data-ed>Différents bruits ambiants</li><li data-ed>Sources parasites : ventilateur, voix, circulation, outils électriques</li><li data-ed>Plusieurs essais pour une même configuration</li><li data-ed>Stabilité de la détection dans le temps</li><li data-ed>Affichage LEDs</li><li data-ed>Transmission WiFi</li><li data-ed>Tout le système en fonctionnement simultané</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un fichier de résultats par configuration.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">9.3</span><h4 class="sub-t" data-ed>Indicateurs de performance</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Ces indicateurs résument objectivement la qualité du système et correspondent aux exigences du cahier des charges.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Tableur</span><span class="tool" data-ed>Python</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Erreur angulaire moyenne</li><li data-ed>Taux de détection</li><li data-ed>Taux de fausses détections</li><li data-ed>Temps de réaction</li><li data-ed>Portée maximale de détection</li><li data-ed>Stabilité de l'angle estimé (écart-type)</li></ul>
+        <div class="formula" data-ed>Taux de détection = détections correctes ÷ passages de drone   ·   Fausses détections = alertes sans drone ÷ essais sans drone</div>
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un chiffre par indicateur et par condition.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">9.4</span><h4 class="sub-t" data-ed>Analyse des résultats</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Les chiffres seuls ne suffisent pas : il faut les expliquer. Montrer quand et pourquoi le système se trompe prouve que vous le comprenez.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>matplotlib</span><span class="tool" data-ed>Google Docs</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Comparer aux objectifs du cahier des charges</li><li data-ed>Identifier les conditions de fonctionnement optimales</li><li data-ed>Identifier les limites du système</li><li data-ed>Expliquer les causes des erreurs</li><li data-ed>Identifier les améliorations prioritaires</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les conclusions du rapport sur les performances.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un tableau de résultats complet</li><li data-ed>Des mesures répétables</li><li data-ed>Des graphiques des performances</li><li data-ed>Une analyse des limites et des conditions de fonctionnement</li><li data-ed>Une validation quantitative du prototype</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Valider le système uniquement avec une démonstration réussie. Faites des tests répétables et quantifiez les performances.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 10</h4><p data-ed>Les résultats sont comparés point par point au cahier des charges.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-10">
+   <div class="rail"><span class="badge">10</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Prise en main de KiCad</h3><span class="dur" data-ed>sem. 6–10 · en parallèle du prototypage, dès que les blocs sont validés</span><span class="phase">Phase 5 · Préparation et réalisation du PCB</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>KiCad</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Préparer le S6 en saisissant le schéma de la future carte.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>La préparation du PCB peut commencer en parallèle du prototypage, mais la conception définitive doit reposer sur des blocs validés. On ne dessine pas une carte définitive à partir d'un circuit pas encore testé sur LabBoard.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">10.1</span><h4 class="sub-t" data-ed>Apprendre</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>KiCad sert à dessiner le schéma puis la carte. Un petit projet d'essai permet d'apprendre le logiciel sans risquer d'abîmer le vrai schéma.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Tutoriel KiCad officiel</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Faire un petit projet d'essai : schéma, empreintes, routage</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les bases du logiciel.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">10.2</span><h4 class="sub-t" data-ed>Saisir le schéma</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On recopie dans KiCad le circuit qui a été validé sur LabBoard. La vérification ERC détecte les erreurs comme une broche non connectée ou deux sorties reliées.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>KiCad : Schematic</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Reprendre le schéma validé sur LabBoard</li><li data-ed>Ajouter microcontrôleur, alimentation, connecteurs, LEDs</li><li data-ed>Lancer la vérification électrique (ERC)</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un schéma sans erreur ERC.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">10.3</span><h4 class="sub-t" data-ed>Empreintes</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Chaque symbole du schéma doit être associé à une empreinte, la forme physique du composant sur la carte. Une mauvaise empreinte rend le composant impossible à souder.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>KiCad : Footprints</span><span class="tool" data-ed>Datasheets</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Choisir les empreintes des composants que vous aurez vraiment</li><li data-ed>Préférer des boîtiers soudables à la main</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>La liste des empreintes.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c3">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">10.4</span><h4 class="sub-t" data-ed>Préparation du PCB</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Ces vérifications évitent de découvrir une erreur après fabrication, quand il est trop tard pour la corriger facilement. Les points de test et connecteurs facilitent les mesures et la programmation de la carte au S6.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>KiCad</span><span class="tool" data-ed>Datasheets</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Vérifier que le schéma correspond au prototype validé sur LabBoard</li><li data-ed>Vérifier les alimentations et tensions de chaque composant</li><li data-ed>Vérifier les références et empreintes à partir des datasheets</li><li data-ed>Prévoir des points de test pour faciliter les mesures</li><li data-ed>Prévoir des connecteurs accessibles pour la programmation et le débogage</li><li data-ed>Réfléchir à la séparation analogique sensible / numérique</li><li data-ed>Vérifier le placement des micros et leur géométrie</li><li data-ed>Vérifier les composants disponibles et leur compatibilité avec la fabrication</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un schéma prêt à être routé.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un schéma KiCad complet</li><li data-ed>Des références de composants vérifiées</li><li data-ed>Des empreintes adaptées</li><li data-ed>Un schéma électrique validé</li><li data-ed>Un PCB préparé pour le routage</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Choisir des composants CMS trop petits pour être soudés à la main.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 11</h4><p data-ed>Le schéma KiCad passe l'ERC sans erreur.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-11">
+   <div class="rail"><span class="badge">11</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Livrables du S5</h3><span class="dur" data-ed>sem. 11–12 · 2 semaines, le rapport s'écrit en continu</span><span class="phase">Phase 5 · Préparation et réalisation du PCB</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>Zotero</span><span class="tool" data-ed>Google Slides ou PowerPoint</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Rendre le prototype, le rapport écrit et la soutenance orale.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Rapport, mesures, simulations et documentation se construisent tout au long du projet, pas seulement à la fin du semestre.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">11.1</span><h4 class="sub-t" data-ed>Rapport</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le rapport raconte tout le projet. S'il est rempli à la fin de chaque étape, il ne reste qu'à le relire et le mettre en forme à la fin.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>Zotero</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Contexte, bibliographie, cahier des charges, architecture, simulations, mesures, résultats, limites, perspectives</li><li data-ed>Chaque chapitre est rempli à la fin de son étape</li><li data-ed>Mettre à jour le rapport après chaque étape</li><li data-ed>Conserver les simulations et les résultats</li><li data-ed>Organiser les mesures dans des tableaux</li><li data-ed>Conserver les versions validées des codes (une version marquée sur GitHub à chaque validation)</li><li data-ed>Documenter les choix techniques et leurs justifications</li><li data-ed>Présenter les problèmes rencontrés et les solutions retenues</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le livrable écrit.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">11.2</span><h4 class="sub-t" data-ed>Soutenance</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>L'oral doit montrer en peu de temps ce que vous avez fait et compris. Les schémas et les courbes parlent plus qu'un texte.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Slides</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Une idée par diapo, beaucoup de schémas et de courbes</li><li data-ed>Répéter en chronométrant</li><li data-ed>Préparer les graphiques et les résultats</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le livrable oral.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">11.3</span><h4 class="sub-t" data-ed>Démo</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Une démo en direct peut échouer (bruit de la salle, batterie). Une vidéo enregistrée avant assure que le jury voit le système fonctionner.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Prototype</span><span class="tool" data-ed>Téléphone</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Démo courte et fiable</li><li data-ed>Vidéo de démonstration de secours</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une démo qui marche à coup sûr.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un prototype LabBoard</li><li data-ed>Un livrable écrit</li><li data-ed>Un livrable oral</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Écrire tout le rapport la dernière semaine.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 12</h4><p data-ed>Rapport rendu, oral passé. Gardez toutes les mesures, elles serviront au S6.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li></ol>
+  </section>
+
+  <section class="sem six" id="s6">
+    <div class="sem-head"><h2>Semestre 6</h2><span class="eyebrow">PCB, soudure et validation finale · <b>≈ 10 semaines</b></span></div>
+    <ol class="steps">
+  <li class="step foldable" id="etape-12">
+   <div class="rail"><span class="badge">12</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Routage du PCB</h3><span class="dur" data-ed>≈ 3 semaines</span><span class="phase">Phase 5 · Préparation et réalisation du PCB</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>KiCad : PCB Editor</span><span class="tool" data-ed>Datasheets</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Transformer le schéma en carte électronique.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Le routage doit tenir compte des contraintes de l'acquisition audio. La géométrie des micros doit être respectée précisément et l'analogique protégé des perturbations du numérique et du WiFi.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">12.1</span><h4 class="sub-t" data-ed>Placement</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Sur le PCB, la position des micros fixe définitivement la géométrie. Une erreur de quelques millimètres fausse l'angle calculé. Il faut aussi séparer physiquement l'analogique, sensible, du numérique, bruyant.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>KiCad</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Placer les micros en respectant précisément la géométrie définie à l'étape 3</li><li data-ed>Prévoir des zones adaptées pour les circuits analogiques sensibles</li><li data-ed>Éloigner le microcontrôleur et l'antenne WiFi de la partie analogique</li><li data-ed>Éloigner autant que possible les circuits numériques bruyants de la partie analogique</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un placement validé avant de router.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">12.2</span><h4 class="sub-t" data-ed>Routage</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Les signaux numériques et le WiFi génèrent des parasites qui peuvent se retrouver dans les signaux des micros. Un bon plan de masse et des condensateurs de découplage près de chaque puce limitent ce problème.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>KiCad</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Plan de masse, pistes d'alimentation larges</li><li data-ed>Limiter les perturbations des circuits numériques et du WiFi</li><li data-ed>Vérifier le découplage de chaque circuit intégré (condensateur au plus près)</li><li data-ed>Prévoir un plan de masse cohérent</li><li data-ed>Prévoir des pistes d'alimentation adaptées</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Un routage propre.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">12.3</span><h4 class="sub-t" data-ed>Vérification et export</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le DRC vérifie que la carte peut être fabriquée : pistes assez larges, écarts suffisants. Les fichiers Gerber sont le format standard envoyé à la fabrication.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>KiCad : DRC</span><span class="tool" data-ed>Visionneuse Gerber</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Vérifier les contraintes de fabrication et de soudure (largeurs, écartements, perçages)</li><li data-ed>Lancer le DRC</li><li data-ed>Exporter les fichiers Gerber</li><li data-ed>Vérifier les largeurs de pistes, espacements et perçages</li><li data-ed>Vérifier les connexions et les points de test</li><li data-ed>Exporter les Gerber seulement après validation</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les Gerber prêts pour la gravure.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un PCB correctement routé</li><li data-ed>Une géométrie des micros respectée</li><li data-ed>Une conception adaptée aux signaux analogiques et numériques</li><li data-ed>Des fichiers Gerber vérifiés</li><li data-ed>Une carte prête pour fabrication</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Un mauvais placement des micros ou des perturbations électriques peuvent dégrader la détection, même si le schéma est correct.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 13</h4><p data-ed>Le DRC ne signale aucune erreur et l'enseignant valide le routage.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-13">
+   <div class="rail"><span class="badge">13</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Fabrication et soudure</h3><span class="dur" data-ed>≈ 2 semaines</span><span class="phase">Phase 5 · Préparation et réalisation du PCB</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Atelier de gravure</span><span class="tool" data-ed>Fer à souder</span><span class="tool" data-ed>Multimètre</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Fabriquer et assembler la carte.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Fabrication et assemblage se font progressivement. Tester chaque bloc après sa soudure permet de trouver rapidement les problèmes.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">13.1</span><h4 class="sub-t" data-ed>Vérification de la carte nue</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Une piste coupée ou deux pistes qui se touchent sont faciles à corriger sur une carte vide, beaucoup plus difficiles une fois les composants soudés.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Multimètre</span><span class="tool" data-ed>Loupe</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Vérifier la carte après fabrication</li><li data-ed>Vérifier la continuité des pistes</li><li data-ed>Vérifier l'absence de courts-circuits</li><li data-ed>Contrôler les alimentations avant de monter tous les composants</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une carte nue sans défaut.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">13.2</span><h4 class="sub-t" data-ed>Soudure et tests par blocs</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Chaque bloc soudé est testé avant le suivant. Si un problème apparaît, on sait qu'il vient du dernier bloc ajouté.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Fer à souder</span><span class="tool" data-ed>Alimentation de labo</span><span class="tool" data-ed>Oscilloscope</span></div>
+        <div class="lab">À faire</div><ol><li data-ed>Souder l'alimentation, puis la tester</li><li data-ed>Souder la partie analogique progressivement, voie par voie, en testant</li><li data-ed>Souder et tester le microcontrôleur</li><li data-ed>Tester les LEDs et les connecteurs</li><li data-ed>Tester le WiFi après validation des autres blocs</li></ol>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Chaque bloc fonctionne avant de passer au suivant.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Une carte correctement fabriquée et assemblée</li><li data-ed>Aucun court-circuit détecté</li><li data-ed>Des blocs électroniques fonctionnels</li><li data-ed>Une carte prête pour les tests complets</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Tout souder puis mettre sous tension. Testez l'alimentation seule en premier.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 14</h4><p data-ed>Toutes les tensions sont correctes et chaque bloc a passé son test.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-14">
+   <div class="rail"><span class="badge">14</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Validation complète</h3><span class="dur" data-ed>≈ 3 semaines</span><span class="phase">Phase 6 · Validation finale</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Oscilloscope</span><span class="tool" data-ed>Python côté PC</span><span class="tool" data-ed>Tableur</span><span class="tool" data-ed>Multimètre</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Valider toutes les parties analogiques et numériques, et la liaison WiFi.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>La validation finale vérifie que le PCB fonctionne et que ses performances sont comparables, voire meilleures, que celles du LabBoard. Une démonstration réussie ne suffit pas : il faut plusieurs essais et des performances chiffrées.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">14.1</span><h4 class="sub-t" data-ed>Validation fonctionnelle</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On vérifie d'abord que chaque fonction marche sur la carte finale, puis que tout marche en même temps.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Oscilloscope</span><span class="tool" data-ed>Multimètre</span><span class="tool" data-ed>Python côté PC</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Comparer les performances du PCB avec celles du LabBoard</li><li data-ed>Vérifier toutes les voies micro</li><li data-ed>Vérifier la stabilité de l'alimentation</li><li data-ed>Vérifier l'algorithme TDOA</li><li data-ed>Vérifier les LEDs</li><li data-ed>Vérifier la communication WiFi</li><li data-ed>Vérifier l'affichage PC</li><li data-ed>Vérifier le fonctionnement simultané de tous les blocs</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une liste de contrôle entièrement validée.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">14.2</span><h4 class="sub-t" data-ed>Validation expérimentale</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On refait la campagne de tests de l'étape 9 sur la carte finale, dans plusieurs environnements, pour obtenir les performances définitives.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Protocole de l'étape 9</span><span class="tool" data-ed>Haut-parleur</span><span class="tool" data-ed>CSV du PC</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Plusieurs angles</li><li data-ed>Différentes distances</li><li data-ed>Différents niveaux sonores</li><li data-ed>Plusieurs environnements</li><li data-ed>Bruits parasites</li><li data-ed>Plusieurs répétitions par condition</li><li data-ed>Enregistrer tous les résultats</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les fichiers de résultats finaux.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">14.3</span><h4 class="sub-t" data-ed>Mesures finales</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Ces mesures sont le bilan chiffré du projet, comparé point par point au cahier des charges.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Tableur</span><span class="tool" data-ed>Multimètre</span><span class="tool" data-ed>matplotlib</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Erreur angulaire moyenne</li><li data-ed>Portée de détection</li><li data-ed>Taux de détection</li><li data-ed>Taux de fausses détections</li><li data-ed>Temps de réaction</li><li data-ed>Consommation électrique et autonomie</li><li data-ed>Stabilité du système</li><li data-ed>Fiabilité globale</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le tableau de performances final.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Un tableau de performances finales</li><li data-ed>Des graphiques et mesures expérimentales</li><li data-ed>Une comparaison LabBoard / PCB</li><li data-ed>Une validation par rapport au cahier des charges</li><li data-ed>Une liste des limites et améliorations possibles</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Avoir perdu les mesures du S5. Sans elles, impossible de comparer.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Pour passer à l'étape 15</h4><p data-ed>Chaque bloc a un résultat de test écrit, réussi ou expliqué.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li>
+  <li class="step foldable" id="etape-15">
+   <div class="rail"><span class="badge">15</span></div>
+   <div class="body">
+    <div class="title-row fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h3 data-ed>Corrections et améliorations</h3><span class="dur" data-ed>≈ 2 semaines</span><span class="phase">Phase 6 · Validation finale</span></div>
+    <div class="step-content fold-body">
+    <div class="tools"><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>Google Slides</span></div>
+    <div class="box obj"><h4>Objectif</h4><p data-ed>Interpréter les résultats, corriger, et chiffrer ce qui pourrait être amélioré.</p></div>
+    <div class="box why"><h4>Pourquoi cette étape compte</h4><p data-ed>Cette étape s'appuie sur les résultats des tests finaux pour proposer des améliorations concrètes et justifiées.</p></div>
+    
+    <div class="subs"><h4 class="subs-k">Sous-étapes</h4>
+    <div class="box sub foldable c0">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">15.1</span><h4 class="sub-t" data-ed>Analyser et corriger</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On part des erreurs mesurées pour trouver leurs causes, puis on corrige en priorité ce qui dégrade le plus les performances. Comparer avant et après prouve l'effet de chaque correction.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Résultats de l'étape 14</span><span class="tool" data-ed>Fer à souder</span><span class="tool" data-ed>GitHub</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Identifier les principales sources d'erreur</li><li data-ed>Améliorer la stabilité de l'estimation de direction</li><li data-ed>Améliorer les performances en présence de bruit</li><li data-ed>Optimiser les paramètres de l'algorithme</li><li data-ed>Améliorer la qualité de l'acquisition</li><li data-ed>Réduire les perturbations électroniques</li><li data-ed>Améliorer la portée si nécessaire</li><li data-ed>Améliorer la consommation</li><li data-ed>Comparer les résultats avant et après chaque amélioration</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Une liste des corrections avec leur effet mesuré.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c1">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">15.2</span><h4 class="sub-t" data-ed>Améliorations</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>On propose ce qu'on ferait avec plus de temps, en chiffrant le gain attendu. Cela montre que vous connaissez les limites de votre système.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Docs</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Proposer des évolutions matérielles ou logicielles</li><li data-ed>Chiffrer les gains attendus : portée, précision, consommation</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Les perspectives du rapport.</span></p>
+      </div>
+    </div>
+    <div class="box sub foldable c2">
+      <div class="sub-head fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><span class="sub-n">15.3</span><h4 class="sub-t" data-ed>Livrables</h4></div>
+      <div class="sub-body fold-body">
+        <p class="exp" data-ed>Le rapport final et l'oral du S6 reprennent tout le projet, du cahier des charges aux résultats sur la carte finale.</p>
+        <div class="lab">Outils</div><div class="tools"><span class="tool" data-ed>Google Docs</span><span class="tool" data-ed>Google Slides</span></div>
+        <div class="lab">À faire</div><ul><li data-ed>Rapport final</li><li data-ed>Soutenance du S6</li></ul>
+        
+        <p class="find"><span class="find-k">À trouver</span> <span data-ed>Le projet terminé.</span></p>
+      </div>
+    </div></div>
+    
+    <div class="pair">
+     <div class="box out"><h4>À la fin vous avez</h4><ul><li data-ed>Le rapport final et la soutenance du S6</li></ul></div>
+     <div class="box trap"><h4>Pièges à éviter</h4><ul><li data-ed>Cacher ce qui ne marche pas. Un défaut bien analysé rapporte des points.</li></ul></div>
+    </div>
+    <div class="box gate"><h4>Fin du projet</h4><p data-ed>Projet terminé.</p></div>
+    <button type="button" class="add-rem">+ Ajouter une remarque à cette étape</button>
+    </div>
+   </div>
+  </li></ol>
+  </section>
+
+  <section class="panel foldable" id="planning">
+    <div class="fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h2>Planning du S5</h2></div><div class="fold-body">
+    <p class="note" data-ed>Additionnées une à une, les durées dépassent 12 semaines. Le planning tient parce que plusieurs étapes avancent en parallèle (pointillés), avec une marge pour les imprévus (orange). À vérifier par rapport à la durée réelle du semestre, aux dates de rendu et aux heures encadrées.</p>
+    <div class="gantt-wrap"><div class="gantt"><span></span><span class="h">S1</span><span class="h">S2</span><span class="h">S3</span><span class="h">S4</span><span class="h">S5</span><span class="h">S6</span><span class="h">S7</span><span class="h">S8</span><span class="h">S9</span><span class="h">S10</span><span class="h">S11</span><span class="h">S12</span><span class="lbl" style="grid-row:2;grid-column:1">1. S'organiser et comprendre le sujet</span><span class="bar" style="grid-row:2;grid-column:2 / 3"></span><span class="lbl" style="grid-row:3;grid-column:1">2. Étude bibliographique</span><span class="bar light" style="grid-row:3;grid-column:2 / 4"></span><span class="lbl" style="grid-row:4;grid-column:1">3. Cahier des charges et architecture</span><span class="bar" style="grid-row:4;grid-column:3 / 5"></span><span class="lbl" style="grid-row:5;grid-column:1">4. Simulation analogique sur LTspice</span><span class="bar" style="grid-row:5;grid-column:4 / 6"></span><span class="lbl" style="grid-row:6;grid-column:1">5. Traitement du signal sur Colab</span><span class="bar light" style="grid-row:6;grid-column:3 / 7"></span><span class="lbl" style="grid-row:7;grid-column:1">6. Prototype sur LabBoard</span><span class="bar" style="grid-row:7;grid-column:6 / 8"></span><span class="lbl" style="grid-row:8;grid-column:1">7. Programmation embarquée</span><span class="bar" style="grid-row:8;grid-column:7 / 10"></span><span class="lbl" style="grid-row:9;grid-column:1">8. Couronne de LEDs et WiFi</span><span class="bar light" style="grid-row:9;grid-column:8 / 10"></span><span class="lbl" style="grid-row:10;grid-column:1">9. Intégration et tests réels</span><span class="bar" style="grid-row:10;grid-column:10 / 12"></span><span class="lbl" style="grid-row:11;grid-column:1">10. Prise en main de KiCad</span><span class="bar light" style="grid-row:11;grid-column:7 / 12"></span><span class="lbl" style="grid-row:12;grid-column:1">11. Livrables du S5</span><span class="bar" style="grid-row:12;grid-column:12 / 14"></span><span class="lbl" style="grid-row:13;grid-column:1">Rédaction du rapport</span><span class="bar cont" style="grid-row:13;grid-column:2 / 14"></span><span class="lbl" style="grid-row:14;grid-column:1">Marge pour imprévus</span><span class="bar marge" style="grid-row:14;grid-column:11 / 13"></span></div></div>
+    <div class="cards">
+    <div class="box plan"><h4>Ce qui peut avancer en parallèle</h4><ul>
+        <li data-ed>La bibliographie et l'organisation du projet</li>
+        <li data-ed>La simulation analogique et la préparation des algorithmes</li>
+        <li data-ed>Python / Colab et la définition de l'architecture</li>
+        <li data-ed>La prise en main de KiCad et le prototypage</li>
+        <li data-ed>La rédaction du rapport et les étapes techniques</li>
+        <li data-ed>La préparation du PCB dès que composants et blocs sont validés</li>
+    </ul></div>
+    <div class="box marg"><h4>Prévoir du temps pour</h4><ul>
+        <li data-ed>Les retards de composants</li>
+        <li data-ed>Les problèmes de simulation</li>
+        <li data-ed>Les erreurs de montage</li>
+        <li data-ed>Les corrections de programmation</li>
+        <li data-ed>Les tests supplémentaires</li>
+        <li data-ed>Les reprises de PCB</li>
+        <li data-ed>La rédaction et la préparation de la soutenance</li>
+    </ul></div>
+    </div>
+  </div></section>
+
+  <section class="panel foldable" id="bonus">
+    <div class="fold-head"><button type="button" class="fold" aria-expanded="true" title="Replier / déplier">▾</button><h2>Bonus facultatifs</h2></div><div class="fold-body">
+    <p class="note" data-ed>À envisager seulement si les objectifs principaux sont atteints.</p>
+    <div class="box bonus"><h4>Si le temps le permet</h4><ul>
+        <li data-ed>Indicateur de confiance de la détection</li>
+        <li data-ed>Stabilisation de l'angle estimé</li>
+        <li data-ed>Comparaison de plusieurs algorithmes de détection</li>
+        <li data-ed>Calibration automatique ou semi-automatique</li>
+        <li data-ed>Mode de test pour simuler des angles</li>
+        <li data-ed>Interface PC avec visualisation en temps réel</li>
+        <li data-ed>Enregistrement des mesures et historique</li>
+        <li data-ed>Meilleure géométrie ou meilleur support des micros</li>
+        <li data-ed>Analyse approfondie des performances en présence de bruit</li>
+        <li data-ed>Optimisation de la consommation</li>
+        <li data-ed>Meilleure présentation de la détection sur les LEDs</li>
+        <li data-ed>Vidéo de démonstration de secours</li>
+    </ul></div>
+  </div></section>
+
+  <section class="panel">
+    <h2>Les outils qui vous aideront</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Besoin</th><th>Outil conseillé</th></tr></thead>
+      <tbody>
+        <tr><td data-ed>Rédaction</td><td data-ed>Google Docs : un seul document « rapport » partagé dès l'étape 1</td></tr>
+        <tr><td data-ed>Calculs, tests d'algorithme</td><td data-ed>Google Colab : Python, numpy, scipy, matplotlib</td></tr>
+        <tr><td data-ed>Code du microcontrôleur</td><td data-ed>GitHub : garder les versions, ne pas écraser le code des autres</td></tr>
+        <tr><td data-ed>Suivi de l'avancement</td><td data-ed>Trello : une colonne par étape, une carte par tâche</td></tr>
+        <tr><td data-ed>Schémas de principe</td><td data-ed>draw.io (diagrams.net), s'ouvre depuis Google Drive</td></tr>
+        <tr><td data-ed>Bibliographie</td><td data-ed>Zotero : les citations s'insèrent toutes seules dans Google Docs</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="panel"><h2>Remarques générales</h2><p class="note">Les remarques ajoutées sans endroit précis arrivent ici.</p><div id="general"></div></section>
+</div>
+<script>
+(function(){
+  var wrap=document.getElementById('content');
+  var KEY='sae-drone-etapes';
+  var rev=document.documentElement.getAttribute('data-rev')||'0';
+  var btnEdit=document.getElementById('tb-edit'),btnRem=document.getElementById('tb-rem'),btnSave=document.getElementById('tb-save'),btnHelp=document.getElementById('tb-help'),btnReset=document.getElementById('tb-reset');
+  var status=document.getElementById('status'),help=document.getElementById('help');
+  var picked=null,editing=false,timer=null;
+
+  function setStatus(t){status.textContent=t}
+  // Restaurer la dernière version enregistrée dans ce navigateur pour ce fichier
+  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.rev===rev&&s.html){wrap.innerHTML=s.html;setStatus('Modifications restaurées')}}catch(e){}
+
+  function editables(){return wrap.querySelectorAll('[data-ed]')}
+  function setEditing(on){
+    editing=on;document.body.classList.toggle('editing',on);
+    btnEdit.classList.toggle('on',on);btnEdit.firstChild.textContent=on?'✓ Terminer':'✎ Modifier le texte';
+    editables().forEach(function(el){if(el.closest('.remark'))return;if(on){el.setAttribute('contenteditable','true');el.classList.add('editable')}else{el.removeAttribute('contenteditable');el.classList.remove('editable')}});
+    if(!on)save();
+  }
+  function save(){
+    clearTimeout(timer);
+    try{
+      var c=wrap.cloneNode(true);
+      c.querySelectorAll('[contenteditable]').forEach(function(e){if(!e.classList.contains('txt'))e.removeAttribute('contenteditable')});
+      c.querySelectorAll('.editable').forEach(function(e){e.classList.remove('editable')});
+      c.querySelectorAll('.picked').forEach(function(e){e.classList.remove('picked')});
+      localStorage.setItem(KEY,JSON.stringify({rev:rev,html:c.innerHTML}));
+      setStatus('Enregistré dans ce navigateur · '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+    }catch(e){setStatus('Pense à « Enregistrer le fichier »')}
+  }
+  function later(){clearTimeout(timer);setStatus('Modification…');timer=setTimeout(save,800)}
+
+  function makeRemark(){
+    var d=new Date();
+    var a=document.createElement('aside');a.className='box remark';
+    a.innerHTML='<h4><span>Remarque · '+d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</span><button class="del" type="button" title="Supprimer la remarque" aria-label="Supprimer la remarque">×</button></h4><p class="txt" contenteditable="true"></p>';
+    return a;
+  }
+  function insertRemark(target){
+    var r=makeRemark();
+    var anchor=target||picked;
+    if(anchor&&wrap.contains(anchor)){
+      var block=anchor.closest('.pair')||anchor.closest('.box')||anchor.closest('.title-row')||anchor.closest('.tools')||anchor.closest('.sem-head')||anchor.closest('header')||anchor.closest('.panel');
+      if(block&&block.closest('.remark')){block=block.closest('.remark')}
+      if(block&&block.tagName==='HEADER'){block.parentNode.insertBefore(r,block.nextSibling)}
+      else if(block){block.parentNode.insertBefore(r,block.nextSibling)}
+      else document.getElementById('general').appendChild(r);
+    }else document.getElementById('general').appendChild(r);
+    var t=r.querySelector('.txt');t.focus();r.scrollIntoView({block:'nearest',behavior:'smooth'});later();
+  }
+
+  // Sélection de l'endroit où ajouter une remarque
+  wrap.addEventListener('focusin',pick);wrap.addEventListener('click',pick);
+  function pick(e){
+    var el=e.target.closest('.box,.title-row,.tools,.sem-head,header,.panel');
+    if(!el)return;if(picked)picked.classList.remove('picked');picked=el;
+    if(el.classList.contains('box'))el.classList.add('picked');
+  }
+  wrap.addEventListener('click',function(e){
+    var del=e.target.closest('.remark .del');if(del){del.closest('.remark').remove();picked=null;save();return}
+    var add=e.target.closest('.add-rem');if(add){var step=add.closest('.body');insertRemarkInStep(step,add);return}
+  });
+  function insertRemarkInStep(step,btn){var r=makeRemark();btn.parentNode.insertBefore(r,btn);r.querySelector('.txt').focus();later()}
+  wrap.addEventListener('input',later);
+
+
+  // Replier / déplier
+  function setFold(el,closed){el.classList.toggle('collapsed',closed);var b=el.querySelector(':scope > .fold-head .fold, :scope > .body > .fold-head .fold');if(b)b.setAttribute('aria-expanded',closed?'false':'true')}
+  wrap.addEventListener('click',function(e){
+    var b=e.target.closest('.fold');
+    var head=e.target.closest('.fold-head');
+    if(!b&&!(head&&!editing&&!e.target.closest('a,.remark,button')))return;
+    var f=(b||head).closest('.foldable');if(!f)return;
+    setFold(f,!f.classList.contains('collapsed'));save();
+  });
+  document.getElementById('tb-fold').addEventListener('click',function(){
+    wrap.querySelectorAll('.step.foldable,.panel.foldable').forEach(function(f){setFold(f,true)});save();
+  });
+  document.getElementById('tb-unfold').addEventListener('click',function(){
+    wrap.querySelectorAll('.foldable').forEach(function(f){setFold(f,false)});save();
+  });
+
+  // Télécharger une copie du fichier avec toutes les modifications
+  function download(){
+    var wasEditing=editing;if(editing)setEditing(false);
+    var newRev=String(Date.now());
+    var doc=document.documentElement.cloneNode(true);
+    doc.setAttribute('data-rev',newRev);
+    doc.querySelector('body').classList.remove('editing');
+    doc.querySelectorAll('.picked').forEach(function(e){e.classList.remove('picked')});
+    doc.querySelector('#status').textContent='';
+    var html='<!DOCTYPE html>\n'+doc.outerHTML;
+    var blob=new Blob([html],{type:'text/html'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    var d=new Date();a.download='etapes-sae-drone-'+d.toISOString().slice(0,10)+'.html';
+    document.body.appendChild(a);a.click();a.remove();
+    rev=newRev;document.documentElement.setAttribute('data-rev',rev);save();
+    setStatus('Fichier téléchargé : '+a.download);
+    if(wasEditing)setEditing(true);
+  }
+  function reset(){
+    if(!document.getElementById('tb-reset').dataset.confirm){btnReset.dataset.confirm='1';btnReset.firstChild.textContent='Confirmer l\'annulation ?';setTimeout(function(){delete btnReset.dataset.confirm;btnReset.firstChild.textContent='Annuler mes modifications'},4000);return}
+    try{localStorage.removeItem(KEY)}catch(e){}location.reload();
+  }
+
+  btnEdit.addEventListener('click',function(){setEditing(!editing)});
+  btnRem.addEventListener('mousedown',function(e){e.preventDefault()});
+  btnRem.addEventListener('click',function(){insertRemark()});
+  btnSave.addEventListener('click',download);
+  btnReset.addEventListener('click',reset);
+  btnHelp.addEventListener('click',function(){help.hidden=!help.hidden});
+
+  document.addEventListener('keydown',function(e){
+    var mod=e.ctrlKey||e.metaKey;
+    if(mod&&(e.key==='e'||e.key==='E')){e.preventDefault();setEditing(!editing)}
+    else if(mod&&(e.key==='m'||e.key==='M')){e.preventDefault();var sel=window.getSelection();var n=sel&&sel.anchorNode;insertRemark(n?(n.nodeType===1?n:n.parentElement):null)}
+    else if(mod&&(e.key==='s'||e.key==='S')){e.preventDefault();download()}
+    else if(e.key==='Escape'&&editing){e.preventDefault();setEditing(false);document.activeElement&&document.activeElement.blur()}
+  });
+  window.addEventListener('beforeunload',save);
+})();
+
+</script>
+</body>
+</html>
