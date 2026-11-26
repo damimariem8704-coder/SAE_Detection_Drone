@@ -1274,6 +1274,7 @@ with open("suivi.csv", "w", newline="") as f:
 
   <section class="panel"><h2>Remarques générales</h2><p class="note">Les remarques ajoutées sans endroit précis arrivent ici.</p><div id="general"></div></section>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   var wrap=document.getElementById('content');
@@ -1284,8 +1285,56 @@ with open("suivi.csv", "w", newline="") as f:
   var picked=null,editing=false,timer=null;
 
   function setStatus(t){status.textContent=t}
-  // Restaurer la dernière version enregistrée dans ce navigateur pour ce fichier
-  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.rev===rev&&s.html){wrap.innerHTML=s.html;setStatus('Modifications restaurées')}}catch(e){}
+  // Connexion à la base partagée Supabase
+  var SUPABASE_URL='https://ydujmikelhoboszrnjbp.supabase.co';
+  var SUPABASE_KEY='sb_publishable_I-UJyWAMocZAcxOHAMfHuQ_EMjt-cTW';
+  var cloud=null, cloudReady=false, cloudTimer=null, applyingRemote=false;
+  try {
+    if(window.supabase && window.supabase.createClient) {
+      cloud=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    }
+  } catch(err) { console.error('Connexion Supabase impossible',err); }
+  function cleanHTML(){
+    var c=wrap.cloneNode(true);
+    c.querySelectorAll('[contenteditable]').forEach(function(e){if(!e.classList.contains('txt'))e.removeAttribute('contenteditable')});
+    c.querySelectorAll('.editable,.picked').forEach(function(e){e.classList.remove('editable','picked')});
+    return c.innerHTML;
+  }
+  async function pushCloud(){
+    if(!cloud || !cloudReady || applyingRemote) return;
+    var html=cleanHTML();
+    setStatus('Synchronisation en ligne…');
+    var result=await cloud.from('roadmap_data').upsert({id:1,content:{html:html},updated_at:new Date().toISOString()},{onConflict:'id'});
+    if(result.error){console.error(result.error);setStatus('Erreur Supabase : '+result.error.message);return;}
+    setStatus('Synchronisé en ligne · '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+  }
+  function scheduleCloud(){
+    if(!cloudReady || applyingRemote) return;
+    clearTimeout(cloudTimer); cloudTimer=setTimeout(pushCloud,1000);
+  }
+  async function initCloud(){
+    if(!cloud){setStatus('Supabase indisponible — sauvegarde locale uniquement');return;}
+    setStatus('Connexion à Supabase…');
+    var result=await cloud.from('roadmap_data').select('content').eq('id',1).maybeSingle();
+    if(result.error){console.error(result.error);setStatus('Erreur de lecture Supabase : '+result.error.message);return;}
+    if(result.data && result.data.content && result.data.content.html){
+      applyingRemote=true; wrap.innerHTML=result.data.content.html; applyingRemote=false;
+      setStatus('Données partagées chargées');
+    } else {
+      // Première visite : initialiser la ligne commune avec le contenu de base
+      var first=await cloud.from('roadmap_data').upsert({id:1,content:{html:cleanHTML()},updated_at:new Date().toISOString()},{onConflict:'id'});
+      if(first.error){console.error(first.error);setStatus('Erreur initialisation : '+first.error.message);return;}
+    }
+    cloudReady=true;
+    cloud.channel('roadmap-live-sync').on('postgres_changes',{event:'UPDATE',schema:'public',table:'roadmap_data',filter:'id=eq.1'},function(payload){
+      if(!payload.new || !payload.new.content || !payload.new.content.html) return;
+      // Ne pas écraser le texte pendant qu'une personne est en train de saisir.
+      if(editing){setStatus('Une mise à jour distante attend la fin de ta modification');return;}
+      applyingRemote=true; wrap.innerHTML=payload.new.content.html; applyingRemote=false;
+      setStatus('Mise à jour reçue d’une autre membre');
+    }).subscribe(function(state){if(state==='SUBSCRIBED')setStatus('Connecté · synchronisation active')});
+  }
+  initCloud();
 
   function editables(){return wrap.querySelectorAll('[data-ed]')}
   function setEditing(on){
@@ -1302,7 +1351,8 @@ with open("suivi.csv", "w", newline="") as f:
       c.querySelectorAll('.editable').forEach(function(e){e.classList.remove('editable')});
       c.querySelectorAll('.picked').forEach(function(e){e.classList.remove('picked')});
       localStorage.setItem(KEY,JSON.stringify({rev:rev,html:c.innerHTML}));
-      setStatus('Enregistré dans ce navigateur · '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+      if(cloudReady && !applyingRemote) scheduleCloud();
+      else if(!cloud) setStatus('Enregistré dans ce navigateur uniquement');
     }catch(e){setStatus('Pense à « Enregistrer le fichier »')}
   }
   function later(){clearTimeout(timer);setStatus('Modification…');timer=setTimeout(save,800)}
